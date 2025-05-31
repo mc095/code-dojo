@@ -4,8 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import AppStateProvider from '@/components/AppStateProvider'; // Renamed and created new for state
 
 export const metadata: Metadata = {
-  title: 'AlgoRace - DSA Challenge',
-  description: 'Race to solve DSA problems with your cousin!',
+  title: 'Daily DSA',
+  description: 'Daily DSA problems for us to solve!',
 };
 
 export default function RootLayout({
