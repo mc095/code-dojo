@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import type { Problem, UserRole } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton'; // Added import
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DashboardCalendarProps {
   problems: Problem[];
@@ -28,8 +28,6 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
         const localStorageKey = `algoRace_solved_${problem.id}_${currentUser}`;
         const isSolved = localStorage.getItem(localStorageKey) === 'true';
         if (isSolved) {
-          // Add the date posted if the problem is solved by the current user
-          // Ensure date string is consistently formatted if needed, but Date objects should work
           datesWithActivity.add(problem.datePosted);
         }
       });
@@ -47,14 +45,14 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-headline">Activity</CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-center p-0">
+      <CardContent className="p-0"> {/* Removed flex justify-center */}
         <Calendar
           mode="single"
           selected={currentMonth}
           onSelect={(date) => date && setCurrentMonth(date)}
           month={currentMonth}
           onMonthChange={setCurrentMonth}
-          className="rounded-md p-2 scale-[0.85] sm:scale-100 origin-top"
+          className="rounded-md w-full" // Ensure calendar takes full width of card content, removed scaling
           modifiers={{
             activityDay: activityDates,
           }}
@@ -62,9 +60,9 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
             activityDay: {
               color: 'hsl(var(--primary-foreground))',
               backgroundColor: 'hsl(var(--primary))',
-              borderRadius: '9999px', // make it a circle
-              width: '8px', // smaller dot
-              height: '8px', // smaller dot
+              borderRadius: '9999px',
+              width: '8px',
+              height: '8px',
               margin: 'auto', 
             },
           }}
