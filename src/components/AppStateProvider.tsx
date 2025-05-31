@@ -24,7 +24,7 @@ export function useAppState() {
 
 export default function AppStateProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUserState] = useState<UserRole>('user'); // Default to 'user'
-  const [currentView, setCurrentView] = useState<ViewOption>('problems'); // Default view
+  const [currentView, setCurrentView] = useState<ViewOption>('dashboard'); // Default view is now dashboard
 
   useEffect(() => {
     const storedUser = localStorage.getItem('algoRace_currentUser') as UserRole;

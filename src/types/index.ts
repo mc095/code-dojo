@@ -9,4 +9,4 @@ export interface Problem {
 
 export type UserRole = 'user' | 'cousin';
 
-export type ViewOption = 'problems' | 'calendar' | 'chart';
+export type ViewOption = 'dashboard' | 'chart';
