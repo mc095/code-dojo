@@ -1,14 +1,15 @@
-import type { UserRole } from '@/types';
-import UserSwitcher from '@/components/dashboard/UserSwitcher';
 
-interface HeaderProps {
-  currentUser: UserRole;
-  setCurrentUser: (user: UserRole) => void;
-}
+'use client';
 
-export default function Header({ currentUser, setCurrentUser }: HeaderProps) {
+import { useAppState } from '@/components/AppStateProvider';
+import { Button } from '@/components/ui/button';
+import { ListChecks, CalendarDays, LineChart } from 'lucide-react';
+
+export default function Header() {
+  const { currentView, setCurrentView } = useAppState();
+
   return (
-    <header className="bg-card border-b border-border sticky top-0 z-50">
+    <header className="bg-card border-b border-border sticky top-0 z-50 shadow-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -21,9 +22,35 @@ export default function Header({ currentUser, setCurrentUser }: HeaderProps) {
             </svg>
             <h1 className="text-2xl font-bold text-foreground font-headline">AlgoRace</h1>
           </div>
-          <div className="flex items-center">
-            <UserSwitcher currentUser={currentUser} setCurrentUser={setCurrentUser} />
-          </div>
+          <nav className="flex items-center space-x-2">
+            <Button
+              variant={currentView === 'problems' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setCurrentView('problems')}
+              className="font-medium"
+            >
+              <ListChecks className="mr-2 h-4 w-4" />
+              Problems
+            </Button>
+            <Button
+              variant={currentView === 'calendar' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setCurrentView('calendar')}
+              className="font-medium"
+            >
+              <CalendarDays className="mr-2 h-4 w-4" />
+              Calendar
+            </Button>
+            <Button
+              variant={currentView === 'chart' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setCurrentView('chart')}
+              className="font-medium"
+            >
+              <LineChart className="mr-2 h-4 w-4" />
+              Progress
+            </Button>
+          </nav>
         </div>
       </div>
     </header>

@@ -1,3 +1,4 @@
+
 export interface Problem {
   id: string;
   problemName: string;
@@ -7,3 +8,5 @@ export interface Problem {
 }
 
 export type UserRole = 'user' | 'cousin';
+
+export type ViewOption = 'problems' | 'calendar' | 'chart';
