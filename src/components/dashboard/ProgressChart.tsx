@@ -15,17 +15,17 @@ interface ProgressChartProps {
 interface ChartDataPoint {
   date: string; // Formatted date e.g., "MMM d"
   originalDate: string; // YYYY-MM-DD for sorting
-  'My Progress': number;
-  "Cousin's Progress": number;
+  "Ganesh's Progress": number;
+  "Vaishnavi's Progress": number;
 }
 
 const chartConfig = {
-  myProgress: {
-    label: 'My Progress',
+  ganeshProgress: {
+    label: "Ganesh's Progress",
     color: 'hsl(var(--chart-1))',
   },
-  cousinProgress: {
-    label: "Cousin's Progress",
+  vaishnaviProgress: {
+    label: "Vaishnavi's Progress",
     color: 'hsl(var(--chart-2))',
   },
 } satisfies ChartConfig;
@@ -50,28 +50,27 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
       }
       
       const processedData = allDates.map(currentDateISO => {
-        let userSolvedCount = 0;
-        let cousinSolvedCount = 0;
+        let ganeshSolvedCount = 0;
+        let vaishnaviSolvedCount = 0;
         const targetDate = new Date(currentDateISO + 'T00:00:00');
 
         problems.forEach(problem => {
           if (new Date(problem.datePosted + 'T00:00:00') <= targetDate) {
-            const userSolved = localStorage.getItem(`algoRace_solved_${problem.id}_user`) === 'true';
-            const cousinSolved = localStorage.getItem(`algoRace_solved_${problem.id}_cousin`) === 'true';
-            if (userSolved) userSolvedCount++;
-            if (cousinSolved) cousinSolvedCount++;
+            const ganeshSolved = localStorage.getItem(\`algoRace_solved_\${problem.id}_Ganesh\`) === 'true';
+            const vaishnaviSolved = localStorage.getItem(\`algoRace_solved_\${problem.id}_Vaishnavi\`) === 'true';
+            if (ganeshSolved) ganeshSolvedCount++;
+            if (vaishnaviSolved) vaishnaviSolvedCount++;
           }
         });
         
         return {
           date: format(targetDate, 'MMM d'),
           originalDate: currentDateISO,
-          'My Progress': userSolvedCount,
-          "Cousin's Progress": cousinSolvedCount,
+          "Ganesh's Progress": ganeshSolvedCount,
+          "Vaishnavi's Progress": vaishnaviSolvedCount,
         };
       });
       
-      // Further sort by originalDate just in case format messes order for some locales, though unlikely with 'MMM d'
       processedData.sort((a,b) => new Date(a.originalDate).getTime() - new Date(b.originalDate).getTime());
 
       setChartData(processedData);
@@ -101,7 +100,7 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
       <Card>
         <CardHeader>
           <CardTitle>Progress Over Time</CardTitle>
-          <CardDescription>Track your and your cousin's problem-solving journey.</CardDescription>
+          <CardDescription>Track Ganesh's and Vaishnavi's problem-solving journey.</CardDescription>
         </CardHeader>
         <CardContent className="h-[350px] flex items-center justify-center">
            <p className="text-muted-foreground">No problems solved yet, or still loading solved data.</p>
@@ -109,7 +108,6 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
       </Card>
     );
   }
-
 
   return (
     <Card>
@@ -150,19 +148,19 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
               <Legend />
               <Line
                 type="monotone"
-                dataKey="My Progress"
-                stroke={chartConfig.myProgress.color}
+                dataKey="Ganesh's Progress"
+                stroke={chartConfig.ganeshProgress.color}
                 strokeWidth={2}
                 dot={true}
-                name="My Progress"
+                name="Ganesh's Progress"
               />
               <Line
                 type="monotone"
-                dataKey="Cousin's Progress"
-                stroke={chartConfig.cousinProgress.color}
+                dataKey="Vaishnavi's Progress"
+                stroke={chartConfig.vaishnaviProgress.color}
                 strokeWidth={2}
                 dot={true}
-                name="Cousin's Progress"
+                name="Vaishnavi's Progress"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -171,4 +169,3 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
     </Card>
   );
 }
-

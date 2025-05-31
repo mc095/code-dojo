@@ -1,10 +1,11 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import type { Problem, UserRole } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ExternalLink, UserCircle, Users } from 'lucide-react';
+import { ExternalLink, UserCircle, Users } from 'lucide-react'; // Assuming UserCircle for Ganesh, Users for Vaishnavi
 import { Badge } from '@/components/ui/badge';
 
 interface ProblemItemProps {
@@ -31,7 +32,8 @@ export default function ProblemItem({ problem, currentUser }: ProblemItemProps) 
     }
   };
 
-  const PostedByIcon = problem.postedBy === 'user' ? UserCircle : Users;
+  // Assuming Ganesh is the primary user ('user' equivalent) and Vaishnavi is the 'cousin' equivalent
+  const PostedByIcon = problem.postedBy === 'Ganesh' ? UserCircle : Users;
 
   return (
     <Card className={`transition-all duration-300 ease-in-out ${isSolved ? 'opacity-60' : 'opacity-100'}`}>
@@ -44,7 +46,7 @@ export default function ProblemItem({ problem, currentUser }: ProblemItemProps) 
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-             <Badge variant={problem.postedBy === 'user' ? "secondary" : "outline"} className="capitalize">
+             <Badge variant={problem.postedBy === 'Ganesh' ? "secondary" : "outline"} className="capitalize">
               <PostedByIcon className="mr-1 h-4 w-4" />
               {problem.postedBy}
             </Badge>

@@ -4,9 +4,9 @@ export interface Problem {
   problemName: string;
   url: string;
   datePosted: string; // YYYY-MM-DD
-  postedBy: 'user' | 'cousin';
+  postedBy: 'Ganesh' | 'Vaishnavi';
 }
 
-export type UserRole = 'user' | 'cousin';
+export type UserRole = 'Ganesh' | 'Vaishnavi';
 
 export type ViewOption = 'dashboard' | 'chart';

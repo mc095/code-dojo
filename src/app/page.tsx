@@ -75,7 +75,7 @@ export default function HomePage() {
           <DashboardCalendar problems={problems} currentUser={currentUser} />
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-headline">Statistics ({currentUser === 'user' ? 'Me' : 'Cousin'})</CardTitle>
+              <CardTitle className="text-lg font-headline">Stats ({currentUser === 'Ganesh' ? 'Ganesh' : 'Vaishnavi'})</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
               <div className="flex justify-between">
@@ -88,7 +88,7 @@ export default function HomePage() {
               </div>
             </CardContent>
           </Card>
-          {/* UserSwitcher removed as per request */}
+          {/* UserSwitcher component was previously here, removed as per earlier request */}
         </aside>
       </div>
     );

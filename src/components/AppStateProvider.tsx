@@ -25,12 +25,12 @@ export function useAppState() {
 }
 
 export default function AppStateProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUserState] = useState<UserRole>('user');
+  const [currentUser, setCurrentUserState] = useState<UserRole>('Ganesh'); // Default to Ganesh
   const [currentView, setCurrentView] = useState<ViewOption>('dashboard');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('algoRace_currentUser') as UserRole;
-    if (storedUser && (storedUser === 'user' || storedUser === 'cousin')) {
+    if (storedUser && (storedUser === 'Ganesh' || storedUser === 'Vaishnavi')) {
       setCurrentUserState(storedUser);
     }
   }, []);
