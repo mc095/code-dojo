@@ -10,18 +10,17 @@ import { useAppState } from '@/components/AppStateProvider';
 import problemsData from '@/data/problems.json';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import UserSwitcher from '@/components/dashboard/UserSwitcher'; // Import UserSwitcher
 
 async function getProblems(): Promise<Problem[]> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(problemsData as Problem[]);
-    }, 100); // Reduced delay for faster loading feel
+    }, 100);
   });
 }
 
 export default function HomePage() {
-  const { currentUser, setCurrentUser, currentView } = useAppState(); // Added setCurrentUser
+  const { currentUser, currentView } = useAppState();
   const [problems, setProblems] = useState<Problem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
@@ -54,7 +53,7 @@ export default function HomePage() {
   const renderDashboard = () => {
     if (!isClient || isLoading) {
       return (
-        <div className="flex flex-col lg:flex-row gap-6 mt-6">
+        <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 for space below FloatingNav */}
           <div className="lg:w-3/4 space-y-4">
             <Skeleton className="h-28 w-full rounded-lg" />
             <Skeleton className="h-28 w-full rounded-lg" />
@@ -68,7 +67,7 @@ export default function HomePage() {
       );
     }
     return (
-      <div className="flex flex-col lg:flex-row gap-6 mt-6">
+      <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 */}
         <div className="lg:w-3/4">
           <ProblemList problems={problems} currentUser={currentUser} />
         </div>
@@ -76,7 +75,7 @@ export default function HomePage() {
           <DashboardCalendar problems={problems} currentUser={currentUser} />
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-headline">Statistics</CardTitle>
+              <CardTitle className="text-lg font-headline">Statistics ({currentUser === 'user' ? 'Me' : 'Cousin'})</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
               <div className="flex justify-between">
@@ -84,12 +83,12 @@ export default function HomePage() {
                 <span className="font-semibold">{problems.length}</span>
               </div>
               <div className="flex justify-between">
-                <span>Your Problems Solved:</span>
+                <span>Problems Solved:</span>
                 <span className="font-semibold">{solvedCount}</span>
               </div>
             </CardContent>
           </Card>
-           <UserSwitcher currentUser={currentUser} setCurrentUser={setCurrentUser} />
+          {/* UserSwitcher removed as per request */}
         </aside>
       </div>
     );
@@ -97,15 +96,15 @@ export default function HomePage() {
 
   const renderChart = () => {
     if (!isClient || isLoading) {
-      return <Skeleton className="h-[400px] w-full rounded-lg mt-6" />;
+      return <Skeleton className="h-[400px] w-full rounded-lg mt-24" />; {/* Added mt-24 */}
     }
-    return <ProgressChart problems={problems} />;
+    return <div className="mt-24"><ProgressChart problems={problems} /></div>; {/* Added mt-24 and wrapper div */}
   };
   
-  if (!isClient && !isLoading) { // Basic SSR shell
+  if (!isClient && !isLoading) {
      return (
-      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-6xl">
-         <div className="flex flex-col lg:flex-row gap-6 mt-6">
+      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-4xl"> {/* max-w-4xl for narrower view */}
+         <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 */}
           <div className="lg:w-3/4 space-y-4">
             <Skeleton className="h-28 w-full rounded-lg" />
           </div>
@@ -118,7 +117,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-6xl">
+    <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-4xl"> {/* max-w-4xl for narrower view */}
       {currentView === 'dashboard' && renderDashboard()}
       {currentView === 'chart' && renderChart()}
     </main>
