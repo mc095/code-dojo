@@ -53,7 +53,7 @@ export default function HomePage() {
   const renderDashboard = () => {
     if (!isClient || isLoading) {
       return (
-        <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 for space below FloatingNav */}
+        <div className="flex flex-col lg:flex-row gap-6 mt-24">
           <div className="lg:w-3/4 space-y-4">
             <Skeleton className="h-28 w-full rounded-lg" />
             <Skeleton className="h-28 w-full rounded-lg" />
@@ -67,7 +67,7 @@ export default function HomePage() {
       );
     }
     return (
-      <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 */}
+      <div className="flex flex-col lg:flex-row gap-6 mt-24">
         <div className="lg:w-3/4">
           <ProblemList problems={problems} currentUser={currentUser} />
         </div>
@@ -96,15 +96,15 @@ export default function HomePage() {
 
   const renderChart = () => {
     if (!isClient || isLoading) {
-      return <Skeleton className="h-[400px] w-full rounded-lg mt-24" />; {/* Added mt-24 */}
+      return <Skeleton className="h-[400px] w-full rounded-lg mt-24" />;
     }
-    return <div className="mt-24"><ProgressChart problems={problems} /></div>; {/* Added mt-24 and wrapper div */}
+    return <div className="mt-24"><ProgressChart problems={problems} /></div>;
   };
   
   if (!isClient && !isLoading) {
      return (
-      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-4xl"> {/* max-w-4xl for narrower view */}
-         <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 */}
+      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-5xl">
+         <div className="flex flex-col lg:flex-row gap-6 mt-24">
           <div className="lg:w-3/4 space-y-4">
             <Skeleton className="h-28 w-full rounded-lg" />
           </div>
@@ -117,7 +117,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-4xl"> {/* max-w-4xl for narrower view */}
+    <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-5xl">
       {currentView === 'dashboard' && renderDashboard()}
       {currentView === 'chart' && renderChart()}
     </main>

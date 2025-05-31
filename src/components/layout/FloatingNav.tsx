@@ -7,7 +7,7 @@ import type { ViewOption } from '@/types';
 
 export interface NavItem {
   name: string;
-  link: ViewOption; // Use ViewOption for type safety
+  link: ViewOption;
   icon?: JSX.Element;
 }
 
@@ -29,25 +29,25 @@ export const FloatingNav = ({
   }, []);
 
   if (!isMounted) {
-    return null; // Or a placeholder to prevent layout shift if needed
+    return null;
   }
 
   return (
     <motion.div
       initial={{
         opacity: 0,
-        y: -20, // Start slightly above for slide-in effect
+        y: -20, 
       }}
       animate={{
         y: 0,
         opacity: 1,
       }}
       transition={{
-        duration: 0.3, // Slower, smoother transition
+        duration: 0.3,
         ease: "easeInOut",
       }}
       className={cn(
-        'flex max-w-md fixed top-4 inset-x-0 mx-auto border border-border/20 dark:border-white/[0.2] rounded-full bg-background/80 dark:bg-black/80 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[5000] px-6 py-3 items-center justify-center space-x-4 sm:space-x-4', // Increased padding and space
+        'flex max-w-lg fixed top-4 inset-x-0 mx-auto border border-border/20 dark:border-white/[0.2] rounded-full bg-background/80 dark:bg-black/80 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[5000] px-6 py-3 items-center justify-center space-x-4 sm:space-x-4',
         className
       )}
     >
@@ -77,3 +77,4 @@ export const FloatingNav = ({
     </motion.div>
   );
 };
+
