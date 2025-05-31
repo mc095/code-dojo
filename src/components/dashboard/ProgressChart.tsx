@@ -56,8 +56,8 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
 
         problems.forEach(problem => {
           if (new Date(problem.datePosted + 'T00:00:00') <= targetDate) {
-            const ganeshSolved = localStorage.getItem(\`algoRace_solved_\${problem.id}_Ganesh\`) === 'true';
-            const vaishnaviSolved = localStorage.getItem(\`algoRace_solved_\${problem.id}_Vaishnavi\`) === 'true';
+            const ganeshSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Ganesh`) === 'true';
+            const vaishnaviSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Vaishnavi`) === 'true';
             if (ganeshSolved) ganeshSolvedCount++;
             if (vaishnaviSolved) vaishnaviSolvedCount++;
           }
