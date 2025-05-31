@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import type { Problem, UserRole } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton'; // Added import
 
 interface DashboardCalendarProps {
   problems: Problem[];
