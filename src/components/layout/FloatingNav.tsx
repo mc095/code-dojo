@@ -4,15 +4,13 @@ import React, { useState, useEffect } from 'react';
 import {
   motion,
   AnimatePresence,
-  useScroll,
-  useMotionValueEvent,
 } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { ViewOption } from '@/types';
 
 export interface NavItem {
   name: string;
-  link: ViewOption; // Changed from string to ViewOption
+  link: ViewOption; 
   icon?: JSX.Element;
 }
 
@@ -23,29 +21,10 @@ export const FloatingNav = ({
   className,
 }: {
   navItems: NavItem[];
-  onNavItemClick: (link: ViewOption) => void; // Added callback
-  currentView: ViewOption; // Added to track active view
+  onNavItemClick: (link: ViewOption) => void; 
+  currentView: ViewOption; 
   className?: string;
 }) => {
-  // const { scrollYProgress } = useScroll(); // Hiding on scroll removed
-  // const [visible, setVisible] = useState(true); // Always visible
-
-  // useMotionValueEvent(scrollYProgress, "change", (current) => {
-  //   if (typeof current === "number") {
-  //     let direction = current! - scrollYProgress.getPrevious()!;
-  //     if (scrollYProgress.get() < 0.05) {
-  //       setVisible(true); // Keep visible near top
-  //     } else {
-  //       if (direction < 0) {
-  //         setVisible(true);
-  //       } else {
-  //         // setVisible(false); // Original hide logic
-  //         setVisible(true); // Keep visible on scroll down as well
-  //       }
-  //     }
-  //   }
-  // });
-
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -53,7 +32,7 @@ export const FloatingNav = ({
   }, []);
 
   if (!isMounted) {
-    return null; // Avoid rendering on server or before mount for animations
+    return null; 
   }
 
   return (
@@ -61,14 +40,14 @@ export const FloatingNav = ({
       <motion.div
         initial={{
           opacity: 0,
-          y: -20, // Start slightly above and faded
+          y: -20, 
         }}
         animate={{
-          y: 0, // Animate to final position
+          y: 0, 
           opacity: 1,
         }}
         transition={{
-          duration: 0.3, // Slower, smoother animation
+          duration: 0.3, 
           ease: "easeInOut",
         }}
         className={cn(
@@ -95,7 +74,6 @@ export const FloatingNav = ({
                 <span className="block h-5 w-5 sm:h-4 sm:w-4">{navItem.icon}</span>
               )}
               <span className="hidden sm:block">{navItem.name}</span>
-              {/* Display name below icon on small screens for better readability */}
               <span className="block sm:hidden text-xs mt-0.5">{navItem.name}</span>
             </button>
           );
