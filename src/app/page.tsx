@@ -1,26 +1,25 @@
-'use client'; // This page now needs to be a client component to use the AppStateContext hook
+
+'use client';
 
 import { useEffect, useState } from 'react';
 import type { Problem } from '@/types';
 import ProblemList from '@/components/dashboard/ProblemList';
 import DashboardCalendar from '@/components/dashboard/DashboardCalendar';
-import { useAppState } from '@/components/AppStateProvider'; // Import the hook
-import problemsData from '@/data/problems.json'; // Import problems directly
+import { useAppState } from '@/components/AppStateProvider';
+import problemsData from '@/data/problems.json';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Simulate fetching data, or read from imported JSON
 async function getProblems(): Promise<Problem[]> {
-  // In a real scenario, this could be an API call.
-  // For now, we use the imported JSON.
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(problemsData as Problem[]);
-    }, 500); // Simulate network delay
+    }, 500);
   });
 }
 
 export default function HomePage() {
-  const { currentUser } = useAppState(); // Use the hook to get currentUser
+  const { currentUser } = useAppState();
   const [problems, setProblems] = useState<Problem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
@@ -37,16 +36,17 @@ export default function HomePage() {
   }, []);
 
   if (!isClient) {
-    // Render nothing or a basic SSR fallback until client takes over
     return null;
   }
 
-
   return (
     <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 order-2 lg:order-1">
-          <h2 className="text-3xl font-bold mb-6 text-foreground font-headline">Daily Problems</h2>
+      <Tabs defaultValue="problems" className="w-full">
+        <TabsList className="mb-6 grid w-full grid-cols-2 md:w-[400px]">
+          <TabsTrigger value="problems">Problems</TabsTrigger>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+        </TabsList>
+        <TabsContent value="problems">
           {isLoading ? (
             <div className="space-y-6">
               <Skeleton className="h-32 w-full rounded-lg" />
@@ -56,15 +56,15 @@ export default function HomePage() {
           ) : (
             <ProblemList problems={problems} currentUser={currentUser} />
           )}
-        </div>
-        <div className="lg:col-span-1 order-1 lg:order-2">
+        </TabsContent>
+        <TabsContent value="calendar">
            {isLoading ? (
              <Skeleton className="h-[380px] w-full rounded-lg" />
            ) : (
              <DashboardCalendar problems={problems} />
            )}
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }
