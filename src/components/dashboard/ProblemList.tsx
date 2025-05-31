@@ -18,6 +18,7 @@ export default function ProblemList({ problems, currentUser }: ProblemListProps)
 
   return (
     <div className="space-y-6">
+      <h2 className="text-2xl font-headline text-left mb-4">Today's Problems</h2>
       {sortedProblems.map((problem) => (
         <ProblemItem key={problem.id} problem={problem} currentUser={currentUser} />
       ))}

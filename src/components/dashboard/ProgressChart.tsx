@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,17 +14,17 @@ interface ProgressChartProps {
 interface ChartDataPoint {
   date: string; // Formatted date e.g., "MMM d"
   originalDate: string; // YYYY-MM-DD for sorting
-  "Ganesh's Progress": number;
-  "Vaishnavi's Progress": number;
+  "Koala's Progress": number;
+  "Alpaca's Progress": number;
 }
 
 const chartConfig = {
-  ganeshProgress: {
-    label: "Ganesh's Progress",
+  koalaProgress: {
+    label: "Koala's Progress",
     color: 'hsl(var(--chart-1))',
   },
-  vaishnaviProgress: {
-    label: "Vaishnavi's Progress",
+  alpacaProgress: {
+    label: "Alpaca's Progress",
     color: 'hsl(var(--chart-2))',
   },
 } satisfies ChartConfig;
@@ -50,24 +49,24 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
       }
       
       const processedData = allDates.map(currentDateISO => {
-        let ganeshSolvedCount = 0;
-        let vaishnaviSolvedCount = 0;
+        let koalaSolvedCount = 0;
+        let alpacaSolvedCount = 0;
         const targetDate = new Date(currentDateISO + 'T00:00:00');
 
         problems.forEach(problem => {
           if (new Date(problem.datePosted + 'T00:00:00') <= targetDate) {
-            const ganeshSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Ganesh`) === 'true';
-            const vaishnaviSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Vaishnavi`) === 'true';
-            if (ganeshSolved) ganeshSolvedCount++;
-            if (vaishnaviSolved) vaishnaviSolvedCount++;
+            const koalaSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Koala`) === 'true';
+            const alpacaSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Alpaca`) === 'true';
+            if (koalaSolved) koalaSolvedCount++;
+            if (alpacaSolved) alpacaSolvedCount++;
           }
         });
         
         return {
           date: format(targetDate, 'MMM d'),
           originalDate: currentDateISO,
-          "Ganesh's Progress": ganeshSolvedCount,
-          "Vaishnavi's Progress": vaishnaviSolvedCount,
+          "Koala's Progress": koalaSolvedCount,
+          "Alpaca's Progress": alpacaSolvedCount,
         };
       });
       
@@ -100,7 +99,7 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
       <Card>
         <CardHeader>
           <CardTitle>Progress Over Time</CardTitle>
-          <CardDescription>Track Ganesh's and Vaishnavi's problem-solving journey.</CardDescription>
+          <CardDescription>Track Koala's and Alpaca's problem-solving journey.</CardDescription>
         </CardHeader>
         <CardContent className="h-[350px] flex items-center justify-center">
            <p className="text-muted-foreground">No problems solved yet, or still loading solved data.</p>
@@ -113,7 +112,7 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>Progress Over Time</CardTitle>
-        <CardDescription>Cumulative problems solved by date posted.</CardDescription>
+        <CardDescription>Compare Koala's and Alpaca's problem-solving journey</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[350px] w-full">
@@ -123,7 +122,7 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
               margin={{
                 top: 5,
                 right: 20,
-                left: 0,
+                left: 10,
                 bottom: 5,
               }}
             >
@@ -140,27 +139,35 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
                 tickMargin={8}
                 allowDecimals={false}
                 domain={['dataMin', 'dataMax']}
-               />
+              />
               <Tooltip
                 content={<ChartTooltipContent />}
                 cursorStyle={{ strokeDasharray: '3 3', stroke: 'hsl(var(--muted-foreground))' }}
               />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="Ganesh's Progress"
-                stroke={chartConfig.ganeshProgress.color}
-                strokeWidth={2}
-                dot={true}
-                name="Ganesh's Progress"
+              <Legend 
+                verticalAlign="top" 
+                height={36}
+                formatter={(value) => (
+                  <span className="text-sm font-medium">{value}</span>
+                )}
               />
               <Line
                 type="monotone"
-                dataKey="Vaishnavi's Progress"
-                stroke={chartConfig.vaishnaviProgress.color}
+                dataKey="Koala's Progress"
+                stroke={chartConfig.koalaProgress.color}
                 strokeWidth={2}
-                dot={true}
-                name="Vaishnavi's Progress"
+                dot={{ r: 4, strokeWidth: 2 }}
+                activeDot={{ r: 6, strokeWidth: 2 }}
+                name="Koala's Progress"
+              />
+              <Line
+                type="monotone"
+                dataKey="Alpaca's Progress"
+                stroke={chartConfig.alpacaProgress.color}
+                strokeWidth={2}
+                dot={{ r: 4, strokeWidth: 2 }}
+                activeDot={{ r: 6, strokeWidth: 2 }}
+                name="Alpaca's Progress"
               />
             </LineChart>
           </ResponsiveContainer>

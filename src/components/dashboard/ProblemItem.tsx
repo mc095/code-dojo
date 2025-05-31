@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { ExternalLink, UserCircle, Users } from 'lucide-react'; // Assuming UserCircle for Ganesh, Users for Vaishnavi
 import { Badge } from '@/components/ui/badge';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
+import { auth } from '@/firebase';
 
 interface ProblemItemProps {
   problem: Problem;
@@ -18,22 +20,31 @@ export default function ProblemItem({ problem, currentUser }: ProblemItemProps) 
   const [isSolved, setIsSolved] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const solved = localStorage.getItem(localStorageKey) === 'true';
-      setIsSolved(solved);
-    }
-  }, [localStorageKey]);
+    const fetchSolved = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const docRef = doc(db, 'users', user.uid, 'solvedProblems', problem.id);
+      const docSnap = await getDoc(docRef);
+      setIsSolved(docSnap.exists() && docSnap.data().solved === true);
+    };
+    fetchSolved();
+  }, [problem.id]);
 
-  const handleToggleSolved = () => {
-    if (typeof window !== 'undefined') {
-      const newSolvedState = !isSolved;
-      setIsSolved(newSolvedState);
-      localStorage.setItem(localStorageKey, String(newSolvedState));
+  const handleToggleSolved = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const docRef = doc(db, 'users', user.uid, 'solvedProblems', problem.id);
+    if (!isSolved) {
+      await setDoc(docRef, { solved: true, date: new Date().toISOString() });
+      setIsSolved(true);
+    } else {
+      await deleteDoc(docRef);
+      setIsSolved(false);
     }
   };
 
-  // Assuming Ganesh is the primary user ('user' equivalent) and Vaishnavi is the 'cousin' equivalent
-  const PostedByIcon = problem.postedBy === 'Ganesh' ? UserCircle : Users;
+  // Koala is the primary user, Alpaca is the secondary
+  const PostedByIcon = problem.postedBy === 'Koala' ? UserCircle : Users;
 
   return (
     <Card className={`transition-all duration-300 ease-in-out ${isSolved ? 'opacity-60' : 'opacity-100'}`}>
@@ -46,7 +57,7 @@ export default function ProblemItem({ problem, currentUser }: ProblemItemProps) 
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-             <Badge variant={problem.postedBy === 'Ganesh' ? "secondary" : "outline"} className="capitalize">
+             <Badge variant={problem.postedBy === 'Koala' ? "secondary" : "outline"} className="capitalize">
               <PostedByIcon className="mr-1 h-4 w-4" />
               {problem.postedBy}
             </Badge>

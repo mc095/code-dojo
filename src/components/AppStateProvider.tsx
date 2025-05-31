@@ -1,10 +1,10 @@
-
 'use client';
 
 import { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
 import type { UserRole, ViewOption } from '@/types';
 import { FloatingNav, type NavItem } from '@/components/layout/FloatingNav';
 import { LayoutDashboard, LineChart } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 
 interface AppStateContextType {
@@ -25,12 +25,13 @@ export function useAppState() {
 }
 
 export default function AppStateProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUserState] = useState<UserRole>('Ganesh'); // Default to Ganesh
+  const [currentUser, setCurrentUserState] = useState<UserRole>('Koala'); // Default to Koala
   const [currentView, setCurrentView] = useState<ViewOption>('dashboard');
+  const pathname = usePathname();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('algoRace_currentUser') as UserRole;
-    if (storedUser && (storedUser === 'Ganesh' || storedUser === 'Vaishnavi')) {
+    if (storedUser && (storedUser === 'Koala' || storedUser === 'Alpaca')) {
       setCurrentUserState(storedUser);
     }
   }, []);
@@ -49,11 +50,13 @@ export default function AppStateProvider({ children }: { children: ReactNode }) 
 
   return (
     <AppStateContext.Provider value={{ currentUser, setCurrentUser, currentView, setCurrentView }}>
-      <FloatingNav 
-        navItems={navItems} 
-        onNavItemClick={(link) => setCurrentView(link)}
-        currentView={currentView}
-      />
+      {pathname !== '/landing' && (
+        <FloatingNav 
+          navItems={navItems} 
+          onNavItemClick={(link) => setCurrentView(link)}
+          currentView={currentView}
+        />
+      )}
       {children}
     </AppStateContext.Provider>
   );

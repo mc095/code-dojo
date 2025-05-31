@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -42,25 +41,28 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
   }
 
   return (
-    <Card className="transition-all duration-300 ease-in-out">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-headline">Activity</CardTitle>
+    <Card className="transition-all duration-300 ease-in-out hover:shadow-lg rounded-md border border-border/30 bg-card/90 w-[320px] mx-auto">
+      <CardHeader className="pb-2 px-4 pt-4">
+        <CardTitle className="text-base font-headline">Activity</CardTitle>
       </CardHeader>
-      <CardContent> {/* Removed flex justify-center */}
+      <CardContent className="px-4 pb-4 flex justify-center items-center">
         <Calendar
           mode="single"
           selected={currentMonth}
           onSelect={(date) => date && setCurrentMonth(date)}
           month={currentMonth}
           onMonthChange={setCurrentMonth}
-          className="rounded-md w-full max-w-[340px] mx-auto" 
+          className="rounded-md w-[300px] mx-auto"
           modifiers={{
             activityDay: activityDates,
           }}
           modifiersStyles={{
-            activityDay: {}, 
+            activityDay: {
+              backgroundColor: 'hsl(var(--primary)/0.12)',
+              borderRadius: '50%',
+            },
           }}
-           components={{
+          components={{
             DayContent: (props) => {
               const isActivityDay = activityDates.some(
                 (activityDate) =>
@@ -69,20 +71,11 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
                   activityDate.getDate() === props.date.getDate()
               );
               return (
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <span>{props.date.getDate()}</span>
+                <div className="relative w-full h-full flex items-center justify-center group">
+                  <span className="group-hover:scale-105 transition-transform duration-200 font-medium text-sm">{props.date.getDate()}</span>
                   {isActivityDay && (
                     <span
-                      style={{
-                        position: 'absolute',
-                        bottom: '5px', 
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '6px', 
-                        height: '6px',
-                        borderRadius: '50%',
-                        backgroundColor: 'hsl(var(--primary))', 
-                      }}
+                      className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary transition-all duration-200 group-hover:scale-110 shadow"
                     />
                   )}
                 </div>

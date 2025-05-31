@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import {
@@ -7,6 +6,8 @@ import {
 } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { ViewOption } from '@/types';
+import { auth, provider } from '@/firebase';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 export interface NavItem {
   name: string;
@@ -26,10 +27,22 @@ export const FloatingNav = ({
   className?: string;
 }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     setIsMounted(true);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
   }, []);
+
+  const handleSignIn = async () => {
+    await signInWithPopup(auth, provider);
+  };
+  const handleSignOut = async () => {
+    await signOut(auth);
+  };
 
   if (!isMounted) {
     return null;
@@ -51,7 +64,7 @@ export const FloatingNav = ({
           ease: "easeInOut",
         }}
         className={cn(
-          'flex max-w-xs fixed top-4 inset-x-0 mx-auto border border-border/20 dark:border-white/[0.2] rounded-full bg-background/80 dark:bg-black/80 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[5000] px-4 py-2 items-center justify-center space-x-2 sm:space-x-3', // Reduced space-x for tighter packing
+          'flex max-w-2xl fixed top-4 inset-x-0 mx-auto border border-border/30 dark:border-white/[0.18] rounded-lg bg-background/85 dark:bg-black/85 backdrop-blur-md shadow z-[5000] px-6 py-2 items-center justify-center space-x-4',
           className
         )}
       >
@@ -62,19 +75,31 @@ export const FloatingNav = ({
               key={`link=${idx}`}
               onClick={() => onNavItemClick(navItem.link)}
               className={cn(
-                'relative items-center flex flex-col sm:flex-row sm:space-x-1 p-1.5 sm:px-3 sm:py-1.5 rounded-full transition-colors duration-200 ease-in-out',
+                'relative items-center flex flex-col sm:flex-row sm:space-x-1 px-3 py-1 rounded-md transition-all duration-200 ease-in-out',
                 'text-sm font-medium',
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground/70 hover:text-foreground hover:bg-muted/50 dark:hover:bg-muted/30'
+                  ? 'bg-primary text-primary-foreground shadow-sm scale-105'
+                  : 'text-foreground/80 hover:text-foreground hover:bg-muted/60 dark:hover:bg-muted/40'
               )}
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Icon rendering removed */}
-              <span className="block text-xs sm:text-sm">{navItem.name}</span>
+              <span className="block text-sm sm:text-sm tracking-wide">{navItem.name}</span>
             </button>
           );
         })}
+        <div className="flex items-center space-x-2 ml-4">
+          {user ? (
+            <>
+              {user.photoURL && (
+                <img src={user.photoURL} alt="avatar" className="w-6 h-6 rounded-full" />
+              )}
+              <span className="text-xs font-semibold text-foreground/80 max-w-[100px] truncate">{user.displayName || user.email}</span>
+              <button onClick={handleSignOut} className="ml-2 px-2 py-1 text-xs rounded bg-muted hover:bg-muted/70 transition">Sign out</button>
+            </>
+          ) : (
+            <button onClick={handleSignIn} className="ml-2 px-5 py-2 text-base rounded bg-primary text-primary-foreground font-semibold shadow hover:bg-primary/80 transition">Sign in</button>
+          )}
+        </div>
       </motion.div>
     </AnimatePresence>
   );

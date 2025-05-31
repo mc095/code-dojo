@@ -1,12 +1,11 @@
-
 export interface Problem {
   id: string;
   problemName: string;
   url: string;
   datePosted: string; // YYYY-MM-DD
-  postedBy: 'Ganesh' | 'Vaishnavi';
+  postedBy: 'Koala' | 'Alpaca';
 }
 
-export type UserRole = 'Ganesh' | 'Vaishnavi';
+export type UserRole = 'Koala' | 'Alpaca';
 
 export type ViewOption = 'dashboard' | 'chart';
