@@ -28,7 +28,9 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
         const localStorageKey = `algoRace_solved_${problem.id}_${currentUser}`;
         const isSolved = localStorage.getItem(localStorageKey) === 'true';
         if (isSolved) {
-          datesWithActivity.add(problem.datePosted);
+          // Ensure datePosted is treated as local date, not UTC
+          const problemDate = new Date(problem.datePosted + 'T00:00:00');
+          datesWithActivity.add(problemDate.toISOString().split('T')[0]);
         }
       });
       setActivityDates(Array.from(datesWithActivity).map(dateStr => new Date(dateStr + 'T00:00:00')));
@@ -37,7 +39,7 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
   
 
   if (!isClient) {
-    return <Skeleton className="h-[320px] w-full rounded-lg" />; 
+    return <Skeleton className="h-[280px] w-full max-w-xs mx-auto rounded-lg" />; 
   }
 
   return (
@@ -45,25 +47,30 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-headline">Activity</CardTitle>
       </CardHeader>
-      <CardContent className="p-0"> {/* Removed flex justify-center */}
+      <CardContent className="p-0 flex justify-center">
         <Calendar
           mode="single"
           selected={currentMonth}
           onSelect={(date) => date && setCurrentMonth(date)}
           month={currentMonth}
           onMonthChange={setCurrentMonth}
-          className="rounded-md w-full" // Ensure calendar takes full width of card content, removed scaling
+          className="rounded-md max-w-[280px]" // Constrain calendar width
+          classNames={{
+            caption_label: "text-xs font-medium",
+            head_cell: "text-muted-foreground rounded-md w-7 h-7 font-normal text-[0.7rem]",
+            cell: "h-7 w-7 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+            day: "h-7 w-7 p-0 font-normal aria-selected:opacity-100 text-xs",
+            day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+            day_today: "bg-accent text-accent-foreground",
+            day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
+            day_disabled: "text-muted-foreground opacity-50",
+          }}
           modifiers={{
             activityDay: activityDates,
           }}
           modifiersStyles={{
-            activityDay: {
-              color: 'hsl(var(--primary-foreground))',
-              backgroundColor: 'hsl(var(--primary))',
-              borderRadius: '9999px',
-              width: '8px',
-              height: '8px',
-              margin: 'auto', 
+            activityDay: { // This style is for the day cell itself if we wanted to style it directly
+              // For the dot, we use DayContent
             },
           }}
            components={{
@@ -81,11 +88,11 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
                     <span
                       style={{
                         position: 'absolute',
-                        bottom: '2px',
+                        bottom: '2px', // Adjusted for smaller cells
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        width: '6px',
-                        height: '6px',
+                        width: '4px',  // Smaller dot
+                        height: '4px', // Smaller dot
                         borderRadius: '50%',
                         backgroundColor: 'hsl(var(--primary))',
                       }}
@@ -100,3 +107,4 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
     </Card>
   );
 }
+
