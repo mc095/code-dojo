@@ -28,7 +28,6 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
         const localStorageKey = `algoRace_solved_${problem.id}_${currentUser}`;
         const isSolved = localStorage.getItem(localStorageKey) === 'true';
         if (isSolved) {
-          // Ensure problem.datePosted is treated as local date by appending time
           const problemDate = new Date(problem.datePosted + 'T00:00:00');
           datesWithActivity.add(problemDate.toISOString().split('T')[0]);
         }
@@ -47,7 +46,7 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-headline">Activity</CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-center">
+      <CardContent> {/* Removed flex justify-center */}
         <Calendar
           mode="single"
           selected={currentMonth}
@@ -95,3 +94,4 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
     </Card>
   );
 }
+
