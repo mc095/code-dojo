@@ -28,6 +28,7 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
         const localStorageKey = `algoRace_solved_${problem.id}_${currentUser}`;
         const isSolved = localStorage.getItem(localStorageKey) === 'true';
         if (isSolved) {
+          // Ensure problem.datePosted is treated as local date by appending time
           const problemDate = new Date(problem.datePosted + 'T00:00:00');
           datesWithActivity.add(problemDate.toISOString().split('T')[0]);
         }
@@ -46,24 +47,14 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-headline">Activity</CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-center"> {/* Removed p-0 to allow default CardContent padding */}
+      <CardContent className="flex justify-center">
         <Calendar
           mode="single"
           selected={currentMonth}
           onSelect={(date) => date && setCurrentMonth(date)}
           month={currentMonth}
           onMonthChange={setCurrentMonth}
-          className="rounded-md w-full max-w-[340px] mx-auto" // Calendar itself has p-3 from base ui/calendar.tsx
-          classNames={{ // Kept existing classNames for consistency with previous requests, default sizes should be fine
-            caption_label: "text-base font-medium",
-            head_cell: "text-muted-foreground rounded-md w-9 h-9 font-normal text-[0.85rem]",
-            cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-            day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-sm",
-            day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-            day_today: "bg-accent text-accent-foreground",
-            day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
-            day_disabled: "text-muted-foreground opacity-50",
-          }}
+          className="rounded-md w-full max-w-[340px] mx-auto" 
           modifiers={{
             activityDay: activityDates,
           }}
@@ -91,7 +82,7 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
                         width: '6px', 
                         height: '6px',
                         borderRadius: '50%',
-                        backgroundColor: 'hsl(var(--primary))',
+                        backgroundColor: 'hsl(var(--primary))', 
                       }}
                     />
                   )}
