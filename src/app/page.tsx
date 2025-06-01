@@ -51,6 +51,8 @@ export default function HomePage() {
   const [solvedCount, setSolvedCount] = useState(0);
   const [isAuthed, setIsAuthed] = useState(false);
   const [userList, setUserList] = useState<{ uid: string; email: string | null }[]>([]);
+  const [userComments, setUserComments] = useState<{ [key: string]: { [problemId: string]: string } }>({});
+  const [isUpdating, setIsUpdating] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     setIsClient(true);
@@ -107,7 +109,121 @@ export default function HomePage() {
     }
   }, [isClient, problems, currentUser, isAuthed]);
 
-  // Add this new useEffect to fetch user list and stats
+  // Update the function to handle both admin and user stats updates
+  const handleUpdateUserStats = async (userId: string) => {
+    try {
+      setIsUpdating(prev => ({ ...prev, [userId]: true }));
+      
+      // Get current solved problems count
+      const solvedSnap = await getDocs(collection(db, 'users', userId, 'solvedProblems'));
+      const solvedCount = solvedSnap.size;
+      
+      // Update stats document
+      const statsRef = doc(db, 'dailyStats', 'stats');
+      const statsDoc = await getDoc(statsRef);
+      const currentStats = statsDoc.exists() ? statsDoc.data() : {
+        problemsPosted: problems.length,
+        userStats: {},
+        lastUpdated: new Date().toISOString()
+      };
+      
+      // Update the stats
+      await setDoc(statsRef, {
+        ...currentStats,
+        problemsPosted: problems.length,
+        userStats: {
+          ...currentStats.userStats,
+          [userId]: solvedCount
+        },
+        lastUpdated: new Date().toISOString()
+      });
+
+      // Update local state
+      setStats(prev => prev.map(stat => 
+        stat.uid === userId 
+          ? { ...stat, solvedCount, lastSolved: new Date().toISOString() }
+          : stat
+      ));
+
+      // If this is the current user, update their solved count
+      if (userId === auth.currentUser?.uid) {
+        setSolvedCount(solvedCount);
+      }
+    } catch (error) {
+      console.error('Error updating stats:', error);
+    } finally {
+      setIsUpdating(prev => ({ ...prev, [userId]: false }));
+    }
+  };
+
+  // Add this function to handle solution comments
+  const handleAddSolution = async (problemId: string, solution: string) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const solutionRef = doc(db, 'users', user.uid, 'solutions', problemId);
+      await setDoc(solutionRef, {
+        solution,
+        timestamp: new Date().toISOString()
+      });
+
+      setUserComments(prev => ({
+        ...prev,
+        [user.uid]: {
+          ...prev[user.uid],
+          [problemId]: solution
+        }
+      }));
+
+      alert('Solution added successfully!');
+    } catch (error) {
+      console.error('Error adding solution:', error);
+      alert('Error adding solution. Please try again.');
+    }
+  };
+
+  // Update the admin stats saving function
+  const handleEndDayAndSaveStats = async () => {
+    const user = auth.currentUser;
+    if (!user || !isAdmin) return;
+    
+    try {
+      // Reset stats document
+      const statsRef = doc(db, 'dailyStats', 'stats');
+      await setDoc(statsRef, {
+        problemsPosted: problems.length,
+        userStats: {},
+        lastUpdated: new Date().toISOString()
+      });
+
+      // Reset solvedProblems and solutions for all users
+      const usersSnap = await getDocs(collection(db, 'users'));
+      for (const userDoc of usersSnap.docs) {
+        // Clear solved problems
+        const solvedSnap = await getDocs(collection(db, 'users', userDoc.id, 'solvedProblems'));
+        for (const solvedDoc of solvedSnap.docs) {
+          await deleteDoc(solvedDoc.ref);
+        }
+        
+        // Clear solutions
+        const solutionsSnap = await getDocs(collection(db, 'users', userDoc.id, 'solutions'));
+        for (const solutionDoc of solutionsSnap.docs) {
+          await deleteDoc(solutionDoc.ref);
+        }
+      }
+      
+      setSolvedCount(0);
+      setUserComments({});
+      setStats([]);
+      alert('Stats and solutions reset for the new day!');
+    } catch (error) {
+      console.error('Error resetting stats:', error);
+      alert('Error resetting stats. Please try again.');
+    }
+  };
+
+  // Update the useEffect to fetch initial stats
   useEffect(() => {
     const fetchUserListAndStats = async () => {
       try {
@@ -116,10 +232,10 @@ export default function HomePage() {
         const users: { uid: string; email: string | null }[] = [];
         const userStats: UserStats[] = [];
 
-        // Get the latest daily stats
-        const statsRef = doc(db, 'dailyStats', 'cumulative');
+        // Get the current stats
+        const statsRef = doc(db, 'dailyStats', 'stats');
         const statsDoc = await getDoc(statsRef);
-        const dailyStats = statsDoc.exists() ? statsDoc.data() : null;
+        const currentStats = statsDoc.exists() ? statsDoc.data() : null;
 
         for (const userDoc of usersSnap.docs) {
           const userData = userDoc.data();
@@ -130,15 +246,15 @@ export default function HomePage() {
             email: userData.email
           });
 
-          // Get solved count from dailyStats
-          const solvedCount = dailyStats?.userStats?.[uid] || 0;
+          // Get solved count from stats
+          const solvedCount = currentStats?.userStats?.[uid] || 0;
           
           userStats.push({
             uid,
             displayName: userData.displayName || userData.email?.split('@')[0] || 'Unknown User',
             solvedCount,
-            lastSolved: dailyStats?.date || null,
-            streak: 0 // We'll calculate this separately if needed
+            lastSolved: currentStats?.lastUpdated || null,
+            streak: 0
           });
         }
 
@@ -153,58 +269,6 @@ export default function HomePage() {
       fetchUserListAndStats();
     }
   }, [isClient, isAuthed]);
-
-  // Update the admin stats saving function
-  const handleEndDayAndSaveStats = async () => {
-    const user = auth.currentUser;
-    if (!user || !isAdmin) return;
-    
-    try {
-      const today = getISTDateString();
-
-      // Get the current cumulative stats
-      const statsRef = doc(db, 'dailyStats', 'cumulative');
-      const statsDoc = await getDoc(statsRef);
-      const currentStats = statsDoc.exists() ? statsDoc.data() : {
-        problemsPosted: 0,
-        userStats: {},
-        lastUpdated: null
-      };
-
-      // Get all users
-      const usersSnap = await getDocs(collection(db, 'users'));
-      const userStats: { [key: string]: number } = { ...currentStats.userStats };
-      
-      // Count solved problems for each user and add to their cumulative total
-      for (const userDoc of usersSnap.docs) {
-        const solvedSnap = await getDocs(collection(db, 'users', userDoc.id, 'solvedProblems'));
-        const todaySolved = solvedSnap.size;
-        userStats[userDoc.id] = (userStats[userDoc.id] || 0) + todaySolved;
-      }
-
-      // Update cumulative stats
-      await setDoc(statsRef, {
-        date: today,
-        problemsPosted: currentStats.problemsPosted, // Keep the cumulative total
-        userStats,
-        lastUpdated: new Date().toISOString()
-      });
-
-      // Reset solvedProblems for all users
-      for (const userDoc of usersSnap.docs) {
-        const solvedSnap = await getDocs(collection(db, 'users', userDoc.id, 'solvedProblems'));
-        for (const solvedDoc of solvedSnap.docs) {
-          await deleteDoc(solvedDoc.ref);
-        }
-      }
-      
-      setSolvedCount(0);
-      alert('Stats updated and reset!');
-    } catch (error) {
-      console.error('Error saving stats:', error);
-      alert('Error saving stats. Please try again.');
-    }
-  };
 
   // Add this new function to handle problem posting
   const handlePostProblems = async (newProblems: Problem[]) => {
@@ -280,7 +344,7 @@ export default function HomePage() {
   };
 
   const handleSolvedCountChange = (count: number) => {
-    setSolvedCount(count);
+      setSolvedCount(count);
   };
 
   const renderChart = () => {
@@ -336,6 +400,13 @@ export default function HomePage() {
                           <p className="text-3xl font-bold text-primary">{solvedCount}</p>
                           <p className="text-sm text-muted-foreground">/ {totalProblems}</p>
                         </div>
+                        <Button
+                          onClick={() => handleUpdateUserStats(user.uid)}
+                          disabled={isUpdating[user.uid]}
+                          className="mt-2"
+                        >
+                          {isUpdating[user.uid] ? 'Updating...' : 'Update Stats'}
+                        </Button>
                       </div>
                     </div>
 
@@ -403,7 +474,7 @@ export default function HomePage() {
           <DashboardCalendar problems={problems} currentUser={currentUser} />
           <Card className="w-[320px] mx-auto rounded-md border border-border/30 bg-card/90">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-headline">Stats ({userProfile?.displayName || 'User'})</CardTitle>
+              <CardTitle className="text-lg font-headline">Today's Stats ({userProfile?.displayName || 'User'})</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
               <div className="flex justify-between">
@@ -414,13 +485,20 @@ export default function HomePage() {
                 <span>Problems Solved:</span>
                 <span className="font-semibold">{solvedCount}</span>
               </div>
+              <Button
+                onClick={() => handleUpdateUserStats(auth.currentUser?.uid || '')}
+                className="w-full mt-4"
+                variant="outline"
+              >
+                Update My Stats
+              </Button>
               {isAdmin && (
                 <>
                   <button
                     onClick={handleEndDayAndSaveStats}
                     className="mt-4 w-full bg-primary text-primary-foreground py-2 rounded font-bold text-base shadow hover:bg-primary/80 transition"
                   >
-                    End Day & Save Stats
+                    End Day & Reset Stats
                   </button>
                   <button
                     onClick={fetchUserUIDs}
@@ -444,9 +522,9 @@ export default function HomePage() {
       </div>
     );
   };
-  
-  if (!isAuthed) return null;
 
+  if (!isAuthed) return null;
+  
   if (!isClient && !isLoading) {
      return (
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-5xl">

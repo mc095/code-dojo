@@ -62,14 +62,14 @@ export default function FloatingNav({ navItems, onNavItemClick, currentView }: F
       router.push('/landing');
     } catch (error) {
       console.error('Error signing out:', error);
-    }
+  }
   };
 
   if (pathname === '/landing') return null;
 
   return (
     <nav
-      className={cn(
+        className={cn(
         'fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300',
         isVisible ? 'translate-y-0' : '-translate-y-32'
       )}

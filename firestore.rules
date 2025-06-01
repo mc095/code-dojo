@@ -18,29 +18,48 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-      allow update: if isOwner(userId) || isAdmin();
-      allow delete: if isAdmin();
+      allow read: if request.auth != null;
+      allow write: if isAdmin() || isOwner(userId);
       
       // Solved problems subcollection
       match /solvedProblems/{problemId} {
         allow read: if isAuthenticated();
-        allow create: if isOwner(userId);
-        allow update: if isOwner(userId);
-        allow delete: if isOwner(userId);
+        allow write: if isAdmin() || isOwner(userId);
+      }
+
+      // Solutions subcollection
+      match /solutions/{problemId} {
+        allow read: if isAuthenticated();
+        allow write: if isAdmin() || isOwner(userId);
+      }
+
+      // Comments subcollection
+      match /comments/{problemId} {
+        allow read: if isAuthenticated();
+        allow write: if isAdmin() || isOwner(userId);
       }
     }
 
-    // Daily stats collection
-    match /dailyStats/{docId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+    // Daily stats collection - allow all authenticated users to read and write
+    match /dailyStats/stats {
+      allow read, write: if isAuthenticated();
     }
 
-    // Allow collection group queries for solved problems
+    // Collection group queries
     match /{path=**}/solvedProblems/{problemId} {
       allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(path.split('/')[1]);
+    }
+
+    match /{path=**}/solutions/{problemId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(path.split('/')[1]);
+    }
+
+    // Problems collection
+    match /problems/{problemId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 } 

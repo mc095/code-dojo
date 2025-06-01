@@ -4,12 +4,16 @@ import { useEffect, useState } from 'react';
 import type { Problem } from '@/types';
 import ProblemList from '@/components/dashboard/ProblemList';
 import DashboardCalendar from '@/components/dashboard/DashboardCalendar';
-import ProgressChart from '@/components/dashboard/ProgressChart';
 import { useAppState } from '@/components/AppStateProvider';
 import problemsData from '@/data/problems.json';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserCircle, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { auth } from '@/firebase';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 async function getProblems(): Promise<Problem[]> {
   return new Promise((resolve) => {
@@ -19,10 +23,11 @@ async function getProblems(): Promise<Problem[]> {
   });
 }
 
-export default function HomePage() {
-  const { currentUser, currentView } = useAppState();
+export default function Header() {
+  const { currentUser, isAdmin, userProfile, currentView, setCurrentView } = useAppState();
+  const router = useRouter();
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [solvedCount, setSolvedCount] = useState(0);
 
@@ -50,86 +55,79 @@ export default function HomePage() {
     }
   }, [isClient, problems, currentUser]);
 
-  const renderDashboard = () => {
-    if (!isClient || isLoading) {
-      return (
-        <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 for space below FloatingNav */}
-          <div className="lg:w-3/4 space-y-4">
-            <Skeleton className="h-28 w-full rounded-lg" />
-            <Skeleton className="h-28 w-full rounded-lg" />
-            <Skeleton className="h-28 w-full rounded-lg" />
-          </div>
-          <div className="lg:w-1/4 space-y-4">
-            <Skeleton className="h-[320px] w-full rounded-lg" />
-            <Skeleton className="h-24 w-full rounded-lg" />
-          </div>
-        </div>
-      );
+  const handleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing in:', error);
+    } finally {
+      setIsLoading(false);
     }
-    return (
-      <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 */}
-        <div className="lg:w-3/4">
-          <ProblemList problems={problems} currentUser={currentUser} />
-        </div>
-        <aside className="lg:w-1/4 space-y-6">
-          <DashboardCalendar problems={problems} currentUser={currentUser} />
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-headline">Statistics ({currentUser === 'Koala' ? 'Me' : 'Cousin'})</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <div className="flex justify-between">
-                <span>Total Problems Posted:</span>
-                <span className="font-semibold">{problems.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Problems Solved:</span>
-                <span className="font-semibold">{solvedCount}</span>
-              </div>
-            </CardContent>
-          </Card>
-          {currentUser === 'Koala' ? (
-            <div className="flex items-center space-x-2">
-              <UserCircle className="h-5 w-5" />
-              <span>Koala</span>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <Users className="h-5 w-5" />
-              <span>Alpaca</span>
-            </div>
-          )}
-        </aside>
-      </div>
-    );
   };
 
-  const renderChart = () => {
-    if (!isClient || isLoading) {
-      return <Skeleton className="h-[400px] w-full rounded-lg mt-24" />;
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+      router.push('/landing');
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
-    return <div className="mt-24"><ProgressChart /></div>;
   };
-  
-  if (!isClient && !isLoading) {
-     return (
-      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-4xl"> {/* max-w-4xl for narrower view */}
-         <div className="flex flex-col lg:flex-row gap-6 mt-24"> {/* Added mt-24 */}
-          <div className="lg:w-3/4 space-y-4">
-            <Skeleton className="h-28 w-full rounded-lg" />
+
+  if (!currentUser) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold">DSA Daily</h1>
           </div>
-          <div className="lg:w-1/4 space-y-4">
-            <Skeleton className="h-[320px] w-full rounded-lg" />
-          </div>
+          <Button
+            onClick={handleSignIn}
+            disabled={isLoading}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            {isLoading ? 'Signing in...' : 'Sign in with Google'}
+          </Button>
         </div>
-      </main>
+      </header>
     );
   }
 
   return (
-    <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-4xl"> {/* max-w-4xl for narrower view */}
-      {currentView === 'dashboard' && renderDashboard()}
-      {currentView === 'chart' && renderChart()}
-    </main>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold">DSA Daily</h1>
+          {isAdmin && (
+            <span className="px-2 py-1 text-xs font-medium bg-primary/10 text-primary rounded">
+              Admin
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-4">
+          <Tabs value={currentView} onValueChange={setCurrentView} className="w-[400px]">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="chart">Progress</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {userProfile?.displayName || userProfile?.email?.split('@')[0] || 'User'}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSignOut}
+            >
+              Sign out
+            </Button>
+          </div>
+        </div>
+      </div>
+    </header>
   );
 }

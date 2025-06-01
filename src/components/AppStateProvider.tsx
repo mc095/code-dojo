@@ -70,7 +70,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         setCurrentUser(null);
         setIsAdmin(false);
         setUserProfile(null);
-      }
+    }
     });
 
     return () => unsubscribe();
@@ -92,11 +92,11 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   return (
     <AppStateContext.Provider value={value}>
       {pathname !== '/landing' && (
-        <FloatingNav 
-          navItems={navItems} 
+      <FloatingNav 
+        navItems={navItems} 
           onNavItemClick={(link: string) => setCurrentView(link as ViewOption)}
-          currentView={currentView}
-        />
+        currentView={currentView}
+      />
       )}
       {children}
     </AppStateContext.Provider>

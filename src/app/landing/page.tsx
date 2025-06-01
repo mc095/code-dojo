@@ -59,18 +59,17 @@ export default function LandingPage(): JSX.Element {
             <div className="space-y-6">
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tight">
                 <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                  Solve &nbsp;
+                  Code &nbsp;
                   <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                   DSA &nbsp;
+                   Dojo &nbsp;
                 </span>
-                with your friend!
                 </span>
                 <br />
                 
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                Track your daily DSA progress, compete with your friends, your self hosted platform
+                Solve DSA with your friends daily, compete with your friends, your self hosted platform
               </p>
             </div>
 
