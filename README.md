@@ -4,7 +4,7 @@ A self-hosted, collaborative platform for daily Data Structures and Algorithm (D
 
 ![Homepage](preview/home.png)
 
-[Watch Demo](https://github.com/mc095/dsa/blob/main/preview/dojo-fast.mp4)
+[![Watch the video](preview/dojo-preview.gif)](https://github.com/mc095/dsa/blob/main/preview/dojo-fast.mp4)
 
 ## Architecture
 
@@ -41,30 +41,30 @@ The application follows a modern architecture with real-time updates and seamles
 ### Installation
 
 1. Clone the repository:
-\`\`\`bash
+```bash
 git clone <your-repo-url>
 cd code-dojo
-\`\`\`
+```
 
 2. Install dependencies:
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 3. Set up your Firebase configuration:
    - Create a new Firebase project
    - Enable Google Authentication
    - Create a Firestore database
-   - Copy your Firebase config to \`.env.local\`:
+   - Copy your Firebase config to `.env.local`:
 
-\`\`\`env
+```bash
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-\`\`\`
+```
 
 4. Start the development server:
 \`\`\`bash
