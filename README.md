@@ -1,5 +1,3 @@
-# Firebase Studio
+# Code Dojo
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+Self hosted Room Web app for problem Solving
