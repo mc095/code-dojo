@@ -32,12 +32,6 @@ service cloud.firestore {
         allow read: if isAuthenticated();
         allow write: if isAdmin() || isOwner(userId);
       }
-
-      // Comments subcollection
-      match /comments/{problemId} {
-        allow read: if isAuthenticated();
-        allow write: if isAdmin() || isOwner(userId);
-      }
     }
 
     // Daily stats collection - allow all authenticated users to read and write
