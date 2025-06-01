@@ -160,24 +160,32 @@ export default function HomePage() {
     if (!user || !isAdmin) return;
     
     try {
-      const problemsPosted = problems.length;
       const today = getISTDateString();
+
+      // Get the current cumulative stats
+      const statsRef = doc(db, 'dailyStats', 'cumulative');
+      const statsDoc = await getDoc(statsRef);
+      const currentStats = statsDoc.exists() ? statsDoc.data() : {
+        problemsPosted: 0,
+        userStats: {},
+        lastUpdated: null
+      };
 
       // Get all users
       const usersSnap = await getDocs(collection(db, 'users'));
-      const userStats: { [key: string]: number } = {};
+      const userStats: { [key: string]: number } = { ...currentStats.userStats };
       
-      // Count solved problems for each user
+      // Count solved problems for each user and add to their cumulative total
       for (const userDoc of usersSnap.docs) {
         const solvedSnap = await getDocs(collection(db, 'users', userDoc.id, 'solvedProblems'));
-        userStats[userDoc.id] = solvedSnap.size;
+        const todaySolved = solvedSnap.size;
+        userStats[userDoc.id] = (userStats[userDoc.id] || 0) + todaySolved;
       }
 
       // Update cumulative stats
-      const statsRef = doc(db, 'dailyStats', 'cumulative');
       await setDoc(statsRef, {
         date: today,
-        problemsPosted,
+        problemsPosted: currentStats.problemsPosted, // Keep the cumulative total
         userStats,
         lastUpdated: new Date().toISOString()
       });
@@ -195,6 +203,51 @@ export default function HomePage() {
     } catch (error) {
       console.error('Error saving stats:', error);
       alert('Error saving stats. Please try again.');
+    }
+  };
+
+  // Add this new function to handle problem posting
+  const handlePostProblems = async (newProblems: Problem[]) => {
+    const user = auth.currentUser;
+    if (!user || !isAdmin) return;
+    
+    try {
+      // Get current cumulative stats
+      const statsRef = doc(db, 'dailyStats', 'cumulative');
+      const statsDoc = await getDoc(statsRef);
+      const currentStats = statsDoc.exists() ? statsDoc.data() : {
+        problemsPosted: 0,
+        userStats: {},
+        lastUpdated: null
+      };
+
+      // Add unique IDs to new problems
+      const problemsWithIds = newProblems.map(problem => ({
+        ...problem,
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      }));
+
+      // Update problems in Firestore
+      const problemsRef = collection(db, 'problems');
+      for (const problem of problemsWithIds) {
+        await setDoc(doc(problemsRef, problem.id), problem);
+      }
+
+      // Update cumulative stats with new problem count
+      await setDoc(statsRef, {
+        ...currentStats,
+        problemsPosted: currentStats.problemsPosted + problemsWithIds.length,
+        lastUpdated: new Date().toISOString()
+      });
+
+      // Refresh the problems list
+      const fetchedProblems = await getProblems();
+      setProblems(fetchedProblems);
+
+      alert('Problems posted successfully!');
+    } catch (error) {
+      console.error('Error posting problems:', error);
+      alert('Error posting problems. Please try again.');
     }
   };
 

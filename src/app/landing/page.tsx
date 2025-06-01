@@ -70,7 +70,7 @@ export default function LandingPage(): JSX.Element {
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                Track your daily DSA progress, compete with friends, and visualize your coding journey with beautiful analytics.
+                Track your daily DSA progress, compete with your friends, your self hosted platform
               </p>
             </div>
 
