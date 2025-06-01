@@ -69,7 +69,7 @@ export default function LandingPage(): JSX.Element {
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                Solve DSA with your friends daily, compete with your friends, your self hosted platform
+                solve DSA with your friends daily, compete with your friends, your self hosted platform
               </p>
             </div>
 
