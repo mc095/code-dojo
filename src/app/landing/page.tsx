@@ -52,7 +52,7 @@ export default function LandingPage(): JSX.Element {
           <div className="max-w-4xl w-full text-center space-y-8">
             {/* Hero Badge */}
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
-              <span className="text-sm font-medium text-gray-300">🚀 Track your coding journey</span>
+              <span className="text-sm font-medium text-gray-300">✨ Track your coding journey</span>
             </div>
 
             {/* Main Heading */}
