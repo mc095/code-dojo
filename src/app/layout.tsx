@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import AppStateProvider from '@/components/AppStateProvider'; // Renamed and created new for state
+import { AppStateProvider } from '@/components/AppStateProvider';
 
 export const metadata: Metadata = {
   title: 'Daily DSA',

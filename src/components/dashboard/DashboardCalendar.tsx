@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface DashboardCalendarProps {
   problems: Problem[];
-  currentUser: UserRole;
+  currentUser: string | null;
 }
 
 export default function DashboardCalendar({ problems, currentUser }: DashboardCalendarProps) {
@@ -62,7 +62,7 @@ export default function DashboardCalendar({ problems, currentUser }: DashboardCa
               borderRadius: '50%',
             },
           }}
-          components={{
+           components={{
             DayContent: (props) => {
               const isActivityDay = activityDates.some(
                 (activityDate) =>

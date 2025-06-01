@@ -9,6 +9,7 @@ import { useAppState } from '@/components/AppStateProvider';
 import problemsData from '@/data/problems.json';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { UserCircle, Users } from 'lucide-react';
 
 async function getProblems(): Promise<Problem[]> {
   return new Promise((resolve) => {
@@ -74,7 +75,7 @@ export default function HomePage() {
           <DashboardCalendar problems={problems} currentUser={currentUser} />
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-headline">Statistics ({currentUser === 'user' ? 'Me' : 'Cousin'})</CardTitle>
+              <CardTitle className="text-lg font-headline">Statistics ({currentUser === 'Koala' ? 'Me' : 'Cousin'})</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
               <div className="flex justify-between">
@@ -87,7 +88,17 @@ export default function HomePage() {
               </div>
             </CardContent>
           </Card>
-          {/* UserSwitcher removed as per request */}
+          {currentUser === 'Koala' ? (
+            <div className="flex items-center space-x-2">
+              <UserCircle className="h-5 w-5" />
+              <span>Koala</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Users className="h-5 w-5" />
+              <span>Alpaca</span>
+            </div>
+          )}
         </aside>
       </div>
     );
@@ -95,9 +106,9 @@ export default function HomePage() {
 
   const renderChart = () => {
     if (!isClient || isLoading) {
-      return <Skeleton className="h-[400px] w-full rounded-lg mt-24" />; {/* Added mt-24 */}
+      return <Skeleton className="h-[400px] w-full rounded-lg mt-24" />;
     }
-    return <div className="mt-24"><ProgressChart problems={problems} /></div>; {/* Added mt-24 and wrapper div */}
+    return <div className="mt-24"><ProgressChart /></div>;
   };
   
   if (!isClient && !isLoading) {

@@ -6,14 +6,19 @@ import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsi
 import type { Problem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
-interface ProgressChartProps {
-  problems: Problem[];
+interface ProgressData {
+  date: string;
+  problemsPosted: number;
+  koalaSolved: number;
+  alpacaSolved: number;
 }
 
 interface ChartDataPoint {
-  date: string; // Formatted date e.g., "MMM d"
-  originalDate: string; // YYYY-MM-DD for sorting
+  date: string;
+  originalDate: string;
   "Koala's Progress": number;
   "Alpaca's Progress": number;
 }
@@ -29,7 +34,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export default function ProgressChart({ problems }: ProgressChartProps) {
+export default function ProgressChart() {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [isClient, setIsClient] = useState(false);
 
@@ -38,71 +43,44 @@ export default function ProgressChart({ problems }: ProgressChartProps) {
   }, []);
 
   useEffect(() => {
-    if (isClient && problems.length > 0) {
-      const allDates = Array.from(new Set(problems.map(p => p.datePosted))).sort(
-        (a, b) => new Date(a).getTime() - new Date(b).getTime()
-      );
-
-      if (allDates.length === 0) {
-        setChartData([]);
-        return;
-      }
-      
-      const processedData = allDates.map(currentDateISO => {
-        let koalaSolvedCount = 0;
-        let alpacaSolvedCount = 0;
-        const targetDate = new Date(currentDateISO + 'T00:00:00');
-
-        problems.forEach(problem => {
-          if (new Date(problem.datePosted + 'T00:00:00') <= targetDate) {
-            const koalaSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Koala`) === 'true';
-            const alpacaSolved = localStorage.getItem(`algoRace_solved_${problem.id}_Alpaca`) === 'true';
-            if (koalaSolved) koalaSolvedCount++;
-            if (alpacaSolved) alpacaSolvedCount++;
+    if (isClient) {
+      const fetchChartData = async () => {
+        try {
+          const statsRef = doc(db, 'dailyStats', 'cumulative');
+          const statsSnap = await getDoc(statsRef);
+          
+          if (statsSnap.exists()) {
+            const data = statsSnap.data() as ProgressData;
+            const formattedData: ChartDataPoint = {
+              date: format(new Date(data.date), 'MMM d'),
+              originalDate: data.date,
+              "Koala's Progress": data.koalaSolved,
+              "Alpaca's Progress": data.alpacaSolved
+            };
+            setChartData([formattedData]);
           }
-        });
-        
-        return {
-          date: format(targetDate, 'MMM d'),
-          originalDate: currentDateISO,
-          "Koala's Progress": koalaSolvedCount,
-          "Alpaca's Progress": alpacaSolvedCount,
-        };
-      });
-      
-      processedData.sort((a,b) => new Date(a.originalDate).getTime() - new Date(b.originalDate).getTime());
+        } catch (error) {
+          console.error('Error fetching progress data:', error);
+        }
+      };
 
-      setChartData(processedData);
+      fetchChartData();
     }
-  }, [isClient, problems]);
+  }, [isClient]);
 
   if (!isClient) {
     return <div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" />;
   }
 
-  if (problems.length === 0) {
+  if (chartData.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Progress Over Time</CardTitle>
-          <CardDescription>No problems posted yet to show progress.</CardDescription>
-        </CardHeader>
-        <CardContent className="h-[350px] flex items-center justify-center">
-          <p className="text-muted-foreground">No data available.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-  
-  if (chartData.length === 0 && problems.length > 0) {
-     return (
       <Card>
         <CardHeader>
           <CardTitle>Progress Over Time</CardTitle>
           <CardDescription>Track Koala's and Alpaca's problem-solving journey.</CardDescription>
         </CardHeader>
         <CardContent className="h-[350px] flex items-center justify-center">
-           <p className="text-muted-foreground">No problems solved yet, or still loading solved data.</p>
+          <p className="text-muted-foreground">No data available.</p>
         </CardContent>
       </Card>
     );
