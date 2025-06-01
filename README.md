@@ -4,7 +4,7 @@ A self-hosted, collaborative platform for daily Data Structures and Algorithm (D
 
 ![Homepage](preview/home.png)
 
-[Watch Demo](preview/dojo-fast.mp4)
+[Watch Demo](https://github.com/mc095/dsa/blob/main/preview/dojo-fast.mp4)
 
 ## Architecture
 
