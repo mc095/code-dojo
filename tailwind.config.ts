@@ -66,7 +66,7 @@ export default {
           ring: 'hsl(var(--sidebar-ring))',
         },
       },
-      borderRadius: { // Ensure this uses the CSS variable
+      borderRadius: { // Ensure this uses the CSS variables
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',

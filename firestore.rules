@@ -27,7 +27,7 @@ service cloud.firestore {
         allow write: if isAdmin() || isOwner(userId);
       }
 
-      // Solutions subcollection
+      // Solutions subcollections
       match /solutions/{problemId} {
         allow read: if isAuthenticated();
         allow write: if isAdmin() || isOwner(userId);
