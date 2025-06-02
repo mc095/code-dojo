@@ -38,6 +38,11 @@ The application follows a modern architecture with real-time updates and seamles
 - Firebase account
 - Git
 
+## Self-Hosting Manual
+
+For detailed self-hosting instructions, visit:
+[Self-Hosting Manual](https://mc095.github.io/jsonparser/self-hosting-manual)
+
 ### Installation
 
 1. Clone the repository:
@@ -67,9 +72,9 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
 
 4. Start the development server:
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 Visit [http://localhost:9002](http://localhost:9002) to see your app.
 
@@ -102,8 +107,5 @@ Visit [http://localhost:9002](http://localhost:9002) to see your app.
 - User rankings
 - Solving streaks
 
-## Self-Hosting Manual
 
-For detailed self-hosting instructions, visit:
-[Self-Hosting Manual](https://mc095.github.io/jsonparser/self-hosting-manual)
 
